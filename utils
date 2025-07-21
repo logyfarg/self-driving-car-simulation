@@ -1,0 +1,33 @@
+import math
+import pygame
+
+def get_sensor_data(x, y, angle, ray_count, ray_length, walls):
+    data = []
+    angle_step = 180 / (ray_count - 1)
+    for i in range(ray_count):
+        ray_angle = angle - 90 + i * angle_step
+        end_x = x + math.cos(math.radians(ray_angle)) * ray_length
+        end_y = y + math.sin(math.radians(ray_angle)) * ray_length
+        ray = pygame.Rect(0, 0, 1, 1)
+        min_distance = ray_length
+        for l in range(0, int(ray_length), 5):
+            test_x = x + math.cos(math.radians(ray_angle)) * l
+            test_y = y + math.sin(math.radians(ray_angle)) * l
+            point = pygame.Rect(test_x, test_y, 2, 2)
+            for wall in walls:
+                if wall.colliderect(point):
+                    min_distance = l
+                    break
+            else:
+                continue
+            break
+        data.append(min_distance / ray_length)
+    return data
+
+def rotate_point(px, py, ox, oy, angle):
+    radians = math.radians(angle)
+    cos_a = math.cos(radians)
+    sin_a = math.sin(radians)
+    dx = px - ox
+    dy = py - oy
+    return ox + dx * cos_a - dy * sin_a, oy + dx * sin_a + dy * cos_a
